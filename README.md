@@ -64,3 +64,4 @@ Angular8, HTML,css etc
    Please find the screenshot below : 
    
    ![Image description](https://github.com/merlinchacko/media-search/media-search.png)
+

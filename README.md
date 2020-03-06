@@ -63,4 +63,4 @@ Angular8, HTML,css etc
    
    Please find the screenshot below : 
    
-   ![Image description](Media search.png)
+   ![alt text](Media search.png)

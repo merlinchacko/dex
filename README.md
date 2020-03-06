@@ -53,7 +53,7 @@ Angular8, HTML,css etc
 ### Deployment Instructions
  
 1. Clone the git repo “https://github.com/merlinchacko/media-search.git” locally.
-2. Run command "./gradlew clean build" (optional step).
+2. Run command "./gradlew clean build".
 3. Run command "./gradlew bootRun" for running the backend.
 5. Run command " ng serve --open" for running the frontend. 
     This will open a browser locally with url "http://localhost:4200/"

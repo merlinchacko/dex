@@ -1,0 +1,29 @@
+service:
+  google-books-api:
+    url: https://www.googleapis.com/books/v1/volumes?q={inputTerm}&maxResults=5
+  itunes-search-api:
+    url: https://itunes.apple.com/search?term={inputTerm}&limit=5
+
+management.endpoint.metrics.enabled: true
+management.endpoints.web.exposure.include: '*'
+management.endpoint.prometheus.enabled: true
+management.metrics.export.prometheus.enabled: true
+management.endpoint.health.show-details: always
+management.health.circuitbreakers.enabled: true
+
+resilience4j.circuitbreaker:
+  configs:
+    default:
+      registerHealthIndicator: true
+      ringBufferSizeInClosedState: 5
+      ringBufferSizeInHalfOpenState: 3
+      waitDurationInOpenState: 10s
+      failureRateThreshold: 50
+      recordExceptions:
+        - com.assignment.mediasearch.exception.InvalidResponseException
+
+  instances:
+    googleApiGateway:
+      baseConfig: default
+    iTunesApiGateway:
+      baseConfig: default

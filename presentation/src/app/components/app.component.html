@@ -1,0 +1,57 @@
+<div class="container">
+  <div class="jumbotron">
+    <h1>Welcome</h1>
+    <h2>Search Books and Albums here!!!</h2>
+  </div>
+  <div class="panel panel-primary">
+    <div class="panel-heading">Type your keyword to search!</div>
+    <div class="panel-body">
+      <div class="row">
+        <div class="col-sm-3">
+          <input type="text" [(ngModel)]="inputTerm"/>
+        </div>
+        <div class="col-sm-3">
+          <button (click)="getMediaList()">Search</button>
+        </div>
+      </div>
+<hr>
+      <div *ngIf="loading && !loaded">loading...</div>
+
+      <div *ngIf="errorMessage" class="alert alert-warning">
+        <strong>Warning!</strong> {{errorMessage | json}}
+        <br>
+        Please try with a different keyword.
+      </div>
+
+      <div class="row" *ngIf="loaded">
+        <div class="col-sm-12">
+          <table class="media-table">
+            <thead>
+            <tr>
+              <th colSpan="1">#</th>
+              <th colSpan="6">Title</th>
+              <th colSpan="3">Authors/Artists</th>
+              <th colSpan="2">Type</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr *ngFor="let media of mediaList; let i = index">
+              <td colSpan="1">{{i+1}}</td>
+              <td colSpan="6">{{media.title}}</td>
+              <td colSpan="3"><span *ngFor="let author of media.authors;">{{author}}</span></td>
+              <td colSpan="2 ">{{media.mediaType}}</td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+

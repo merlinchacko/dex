@@ -6,5 +6,5 @@ import java.util.Collection;
 
 public interface MeadiaSearchService {
 
-    Collection<MediaInfo> retrieve(String request);
+    Collection<MediaInfo> retrieve(String inputTerm);
 }

@@ -32,7 +32,10 @@ Frontend is a seprate angular app with a UI , where user can search for a keywor
 It will then list the results in a table format for valid response and shows warning message for 
 invalid responses.
 
-I have added unit test for endpoints and services. Also one to check the circuit breaker.  
+I have used resilience4j for improving resilience and stability of the application, which is lightweight, easy-to-use fault tolerance library. It has circuit braker, rate limiter, retry and bulkhead provisions.
+ But I just implemented only circuit breaker for the assignment.
+
+I have added unit test for endpoints and services and integration tests for google and iTunes gateways. Also one to check the circuit breaker.  
 
 ###  Technologies used
 #### Backend
@@ -57,3 +60,7 @@ Angular8, HTML,css etc
 3. Run command "./gradlew bootRun" for running the backend.
 5. Run command " ng serve --open" for running the frontend. 
     This will open a browser locally with url "http://localhost:4200/"
+   
+   Please find the screenshot below : 
+   
+   ![Image description](Media search.png)

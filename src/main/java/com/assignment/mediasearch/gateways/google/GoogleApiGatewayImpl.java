@@ -41,14 +41,10 @@ public class GoogleApiGatewayImpl {
 
     @Cacheable("books")
     public Collection<MediaInfo> retrieveBookList(String inputTerm) {
-
-        Collection<GBItemsWrapper> gbItemsWrappers = retrieveGBWrapper(inputTerm).getBody().getItems();
-
+        Collection<GBItemsWrapper> gbItemsWrappers = retrieveGBWrapper(inputTerm);
         for (GBItemsWrapper gbItemsWrapper : gbItemsWrappers) {
-
             validateBooks(gbItemsWrapper);
         }
-
         Collection<MediaInfo> bookMediaInfo = gbItemsWrappers.stream()
                                                              .map(item -> MediaInfo.builder()
                                                                                    .title(item.getVolumeInfo().getTitle())
@@ -71,7 +67,7 @@ public class GoogleApiGatewayImpl {
         return Collections.singletonList(MediaInfo.builder().build());
     }
 
-    public ResponseEntity<GBWrapper> retrieveGBWrapper(String inputTerm) {
+    public Collection<GBItemsWrapper> retrieveGBWrapper(String inputTerm) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(APPLICATION_JSON);
         HttpEntity<String> entity = new HttpEntity<>(headers);
@@ -83,6 +79,6 @@ public class GoogleApiGatewayImpl {
             throw new NotFoundException("Not able to retrieve books using google api.");
         }
 
-        return response;
+        return response.getBody().getItems();
     }
 }

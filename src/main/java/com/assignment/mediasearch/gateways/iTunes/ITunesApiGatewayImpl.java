@@ -44,7 +44,7 @@ public class ITunesApiGatewayImpl {
     private int maxLimit;
 
     public Collection<MediaInfo> retrieveAlbumList(String inputTerm) {
-        Collection<ITunesResultWrapper> iTunesResultWrappers = retrieveITunesWrapper(inputTerm).getBody().getResults();
+        Collection<ITunesResultWrapper> iTunesResultWrappers = retrieveITunesWrapper(inputTerm);
         for (ITunesResultWrapper iTunesResultWrapper : iTunesResultWrappers) {
             validateAlbums(iTunesResultWrapper);
         }
@@ -69,7 +69,7 @@ public class ITunesApiGatewayImpl {
         return Collections.singletonList(MediaInfo.builder().build());
     }
 
-    public ResponseEntity<ITunesWrapper> retrieveITunesWrapper(String inputTerm) {
+    public Collection<ITunesResultWrapper> retrieveITunesWrapper(String inputTerm) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(APPLICATION_JSON);
         HttpEntity<String> entity = new HttpEntity<>(headers);
@@ -91,7 +91,7 @@ public class ITunesApiGatewayImpl {
             throw new NotFoundException("Not able to retrieve albums using iTunes search api.");
         }
 
-        return response;
+        return response.getBody().getResults();
     }
 
 }

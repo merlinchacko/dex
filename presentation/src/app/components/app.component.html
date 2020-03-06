@@ -14,7 +14,7 @@
           <button (click)="getMediaList()">Search</button>
         </div>
       </div>
-<hr>
+      <hr>
       <div *ngIf="loading && !loaded">loading...</div>
 
       <div *ngIf="errorMessage" class="alert alert-warning">
@@ -23,7 +23,7 @@
         Please try with a different keyword.
       </div>
 
-      <div class="row" *ngIf="loaded">
+      <div class="row" *ngIf="loaded && !errorMessage">
         <div class="col-sm-12">
           <table class="media-table">
             <thead>
@@ -36,7 +36,7 @@
             </thead>
             <tbody>
             <tr *ngFor="let media of mediaList; let i = index">
-              <td colSpan="1">{{i+1}}</td>
+              <td colSpan="1">{{i + 1}}</td>
               <td colSpan="6">{{media.title}}</td>
               <td colSpan="3"><span *ngFor="let author of media.authors;">{{author}}</span></td>
               <td colSpan="2 ">{{media.mediaType}}</td>

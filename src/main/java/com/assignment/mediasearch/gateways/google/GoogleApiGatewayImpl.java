@@ -29,22 +29,20 @@ import static org.springframework.http.MediaType.APPLICATION_JSON;
 @Service
 @Slf4j
 @RequiredArgsConstructor
+@CircuitBreaker(name = "googleApiGateway", fallbackMethod = "getFallbackAlbums")
 public class GoogleApiGatewayImpl {
-
     private final RestTemplate restTemplate;
 
     @Value("${service.google-books-api.url}")
     private String googleUrl;
 
+    @Value("${service.max-limit}")
+    private int maxLimit;
+
     @Cacheable("books")
     public Collection<MediaInfo> retrieveBookList(String inputTerm) {
 
-
-
         Collection<GBItemsWrapper> gbItemsWrappers = retrieveGBWrapper(inputTerm).getBody().getItems();
-
-
-
 
         for (GBItemsWrapper gbItemsWrapper : gbItemsWrappers) {
 
@@ -63,30 +61,24 @@ public class GoogleApiGatewayImpl {
     }
 
     private void validateBooks(GBItemsWrapper gbItemsWrapper) {
-
         if (isNull(() -> gbItemsWrapper.getVolumeInfo().getTitle())) {
-
             throw new InvalidResponseException("Google books api returns null response in title.");
         }
     }
 
     public Collection<MediaInfo> getFallbackBooks(String inputTern, Throwable t) {
-
         log.error("CIRCUIT BREAKER ENABLED!!! No Response From Google Api at this moment due to {} ", t.toString());
         return Collections.singletonList(MediaInfo.builder().build());
     }
 
     public ResponseEntity<GBWrapper> retrieveGBWrapper(String inputTerm) {
-
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(APPLICATION_JSON);
-
         HttpEntity<String> entity = new HttpEntity<>(headers);
 
-        ResponseEntity<GBWrapper> response = restTemplate.exchange(googleUrl, HttpMethod.GET, entity, GBWrapper.class, inputTerm);
+        ResponseEntity<GBWrapper> response = restTemplate.exchange(googleUrl + maxLimit, HttpMethod.GET, entity, GBWrapper.class, inputTerm);
 
         if (isNull(() -> response.getBody().getItems())) {
-
             log.error("Not able to retrieve books with keyword {}", inputTerm);
             throw new NotFoundException("Not able to retrieve books using google api.");
         }

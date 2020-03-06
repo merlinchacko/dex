@@ -23,6 +23,7 @@ export class AppComponent implements OnInit {
   }
 
   getMediaList() {
+    console.log('inside--')
     this.loading = true;
     this.errorMessage = "";
     this.api.getMediaList(this.inputTerm)

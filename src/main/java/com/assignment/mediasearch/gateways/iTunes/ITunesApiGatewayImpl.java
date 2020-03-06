@@ -6,6 +6,7 @@ import com.assignment.mediasearch.model.MediaInfo;
 import com.assignment.mediasearch.wrapper.ITunesResultWrapper;
 import com.assignment.mediasearch.wrapper.ITunesWrapper;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -30,23 +31,23 @@ import static org.springframework.http.MediaType.APPLICATION_JSON;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 @CircuitBreaker(name = "iTunesApiGateway", fallbackMethod = "getFallbackAlbums")
 public class ITunesApiGatewayImpl {
 
-    private RestTemplate restTemplate = new RestTemplate();
+    private final RestTemplate restTemplate;
 
     @Value("${service.itunes-search-api.url}")
     private String itunesUrl;
 
+    @Value("${service.max-limit}")
+    private int maxLimit;
+
     public Collection<MediaInfo> retrieveAlbumList(String inputTerm) {
-
         Collection<ITunesResultWrapper> iTunesResultWrappers = retrieveITunesWrapper(inputTerm).getBody().getResults();
-
         for (ITunesResultWrapper iTunesResultWrapper : iTunesResultWrappers) {
-
             validateAlbums(iTunesResultWrapper);
         }
-
         Collection<MediaInfo> albumMediaInfo = iTunesResultWrappers.stream()
                                                                    .map(item -> MediaInfo.builder()
                                                                                          .title(item.getTrackName())
@@ -58,24 +59,19 @@ public class ITunesApiGatewayImpl {
     }
 
     private void validateAlbums(ITunesResultWrapper iTunesResultWrapper) {
-
         if (isNull(() -> iTunesResultWrapper.getTrackName()) || isNull(() -> iTunesResultWrapper.getArtistName())) {
-
             throw new InvalidResponseException("Itunes search api returns null response in track name or artist name.");
         }
     }
 
     public Collection<MediaInfo> getFallbackAlbums(String request, Throwable t) {
-
         log.error("CIRCUIT BREAKER ENABLED!!! No Response From ITunes Api at this moment due to {} ", t.toString());
         return Collections.singletonList(MediaInfo.builder().build());
     }
 
     public ResponseEntity<ITunesWrapper> retrieveITunesWrapper(String inputTerm) {
-
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(APPLICATION_JSON);
-
         HttpEntity<String> entity = new HttpEntity<>(headers);
 
         List<HttpMessageConverter<?>> converters = restTemplate.getMessageConverters();
@@ -88,10 +84,9 @@ public class ITunesApiGatewayImpl {
 
         restTemplate.setMessageConverters(converters);
 
-        ResponseEntity<ITunesWrapper> response = restTemplate.exchange(itunesUrl, HttpMethod.GET, entity, ITunesWrapper.class, inputTerm);
+        ResponseEntity<ITunesWrapper> response = restTemplate.exchange(itunesUrl + maxLimit, HttpMethod.GET, entity, ITunesWrapper.class, inputTerm);
 
         if (isNull(() -> response.getBody().getResults())) {
-
             log.error("Not able to retrieve albums with keyword {}", inputTerm);
             throw new NotFoundException("Not able to retrieve albums using iTunes search api.");
         }

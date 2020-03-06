@@ -1,8 +1,9 @@
 service:
   google-books-api:
-    url: https://www.googleapis.com/books/v1/volumes?q={inputTerm}&maxResults=5
+    url: https://www.googleapis.com/books/v1/volumes?q={inputTerm}&maxResults=
   itunes-search-api:
-    url: https://itunes.apple.com/search?term={inputTerm}&limit=5
+    url: https://itunes.apple.com/search?term={inputTerm}&limit=
+  max-limit: 5
 
 management.endpoint.metrics.enabled: true
 management.endpoints.web.exposure.include: '*'
@@ -15,12 +16,16 @@ resilience4j.circuitbreaker:
   configs:
     default:
       registerHealthIndicator: true
-      ringBufferSizeInClosedState: 5
-      ringBufferSizeInHalfOpenState: 3
-      waitDurationInOpenState: 10s
+      slidingWindowSize: 10
+      minimumNumberOfCalls: 5
+      permittedNumberOfCallsInHalfOpenState: 3
+      automaticTransitionFromOpenToHalfOpenEnabled: true
+      waitDurationInOpenState: 5s
       failureRateThreshold: 50
+      eventConsumerBufferSize: 10
       recordExceptions:
         - com.assignment.mediasearch.exception.InvalidResponseException
+        - com.assignment.mediasearch.exception.NotFoundException
 
   instances:
     googleApiGateway:
